@@ -57,6 +57,14 @@ object PreferencesController {
         set(value) {
             preferences.edit().putBoolean("other", value).apply()
         }
+    var ended: Boolean = preferences.getBoolean("ended", true);
+        set(value) {
+            preferences.edit().putBoolean("ended", value).apply()
+        }
+    var heavy: Boolean = preferences.getBoolean("heavy", true);
+        set(value) {
+            preferences.edit().putBoolean("heavy", value).apply()
+        }
 //    var camera: CameraPosition = CameraPosition(latLng, zoom, 0f, 0f)
 //
 //    fun updateCamera(cameraPosition: CameraPosition) {
