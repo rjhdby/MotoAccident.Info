@@ -8,22 +8,29 @@ import info.motoaccident.dictionaries.AccidentType
 import java.util.*
 
 class Point {
-    var id: Int = 0
-    var time: Long = 0
-    @SerializedName("a") var address: String = ""
-    @SerializedName("d") var description: String = ""
-    @SerializedName("s") var status: AccidentStatus = AccidentStatus.ACTIVE
-    @SerializedName("o") var owner: String = ""
-    var oid: Int = 0
-    var lat: Float = 55.752295f
-    var lon: Float = 37.622735f
-    @SerializedName("t") var type: AccidentType = AccidentType.OTHER
-    var med: AccidentDamage = AccidentDamage.UNKNOWN
+    val id: Int = 0
+    val time: Long = 0
+    @SerializedName("a") val address: String = ""
+    @SerializedName("d") val description: String = ""
+    @SerializedName("s") val status: AccidentStatus = AccidentStatus.ACTIVE
+    @SerializedName("o") val owner: String = ""
+    @SerializedName("oid") val ownerId: Int = 0
+    val lat: Float = 55.752295f
+    val lon: Float = 37.622735f
+    @SerializedName("t") val type: AccidentType = AccidentType.OTHER
+    val med: AccidentDamage = AccidentDamage.UNKNOWN
     @SerializedName("m") var messages: List<Message> = ArrayList()
     @SerializedName("v") var volunteers: List<Volunteer> = ArrayList()
     @SerializedName("h") var history: List<History> = ArrayList()
 
     fun location(): LatLng {
         return LatLng(lat.toDouble(), lon.toDouble())
+    }
+
+    fun isAccident(): Boolean {
+        when (type) {
+            AccidentType.MOTO_AUTO, AccidentType.MOTO_MAN, AccidentType.MOTO_MOTO, AccidentType.SOLO -> return true
+            else -> return false
+        }
     }
 }

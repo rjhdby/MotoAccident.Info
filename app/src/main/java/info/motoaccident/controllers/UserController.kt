@@ -2,61 +2,58 @@ package info.motoaccident.controllers
 
 import info.motoaccident.dictionaries.Role
 import info.motoaccident.network.HttpRequestService
-import rx.Observable
+import info.motoaccident.network.modeles.auth.User
 import rx.android.schedulers.AndroidSchedulers
-import java.util.concurrent.TimeUnit
+import rx.subjects.PublishSubject
 
 object UserController {
-    var id = 0
-        private set
-    var role = Role.UNAUTHORIZED
-        private set
-    private var anonimous = PreferencesController.anonymous
-        private set
-    var needLogin = false;
+    var roleUpdated: PublishSubject<Boolean> = PublishSubject.create()
 
-    val isAuthorized: Observable<Boolean> = Observable.just(false)
-            .repeatWhen { o -> o.delay(100, TimeUnit.MILLISECONDS) }
-            .map { o -> role != Role.UNAUTHORIZED || needLogin }
-            .filter { b -> b }
-            .take(1)
+    private var user = User()
+
+    var role: Role
+        get() = user.role
+        set(value) {
+            user.role = value
+            roleUpdated.onNext(true)
+        }
+    val id: Int
+        get() = user.id
+
+    //Flow control
+    var userUpdated: PublishSubject<Boolean> = PublishSubject.create()
 
     init {
-        initialAuth();
+        if (PreferencesController.anonymous) role = Role.ANONYMOUS
     }
 
     fun logOff() {
-        role = Role.UNAUTHORIZED
+        user = User()
     }
 
-    fun auth(login: String, password: String): Observable<Boolean> {
-
-        return Observable.create { subscriber ->
-            HttpRequestService.api
-                    .auth(login, password)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { auth ->
-                                //TODO user id
-                                //TODO error handling
-                                //TODO user User class instead of local properties
-                                role = auth.result.role
-                                subscriber.onNext(role != Role.UNAUTHORIZED)
-                                subscriber.onCompleted()
-
-                            })
+    fun auth(login: String = PreferencesController.login, password: String = PreferencesController.passHash) {
+        when {
+            role == Role.ANONYMOUS -> userUpdated.onNext(true)
+            login.equals("") || password.equals("") -> userUpdated.onNext(false)
+            else ->
+                HttpRequestService
+                        .api
+                        .auth(login, password)
+                        .retry(3)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { requestResult ->
+                                    //TODO error handling
+                                    if (requestResult.error.equals("")) {
+                                        user = requestResult.result
+                                        userUpdated.onNext(role != Role.UNAUTHORIZED)
+                                    } else {
+                                        //TODO errors control
+                                    }
+                                },
+                                //TODO errors control
+                                { e -> e.printStackTrace() }
+                                  )
         }
-    }
-
-    private fun initialAuth() {
-        if (anonimous) {
-            role = Role.ANONYMOUS
-            return
-        }
-        if (PreferencesController.login.equals("")) {
-            needLogin = true
-            return
-        }
-        auth(PreferencesController.login, PreferencesController.passHash).subscribe { b -> needLogin = !b }
     }
 }

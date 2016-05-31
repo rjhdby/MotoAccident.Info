@@ -48,24 +48,23 @@
 
         <Button
             android:id="@+id/login_button"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            style="@style/auth_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="Войти"
-            android:enabled="false"/>
-
+            android:enabled="false"
+            android:text="Войти"/>
 
         <Button
             android:id="@+id/anonymous_login_button"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            style="@style/auth_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/login_button"
             android:layout_centerHorizontal="true"
-            android:text="Войти анонимно"
-            android:enabled="true"/>
+            android:enabled="true"
+            android:text="Войти анонимно"/>
     </RelativeLayout>
 
 </RelativeLayout>

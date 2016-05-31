@@ -2,6 +2,7 @@ package info.motoaccident.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.EditText
@@ -10,58 +11,71 @@ import com.jakewharton.rxbinding.widget.RxTextView
 import info.motoaccident.R
 import info.motoaccident.controllers.PreferencesController
 import info.motoaccident.controllers.UserController
-import info.motoaccident.utils.MD5
+import info.motoaccident.dictionaries.Role
+import info.motoaccident.utils.bindView
+import info.motoaccident.utils.isNotEmpty
+import info.motoaccident.utils.md5
+import info.motoaccident.utils.value
+import rx.Observable
 import rx.Subscription
 
 class AuthActivity : AppCompatActivity() {
-    lateinit var loginField: EditText
-    lateinit var passwordField: EditText
-    lateinit var loginButton: Button
-    lateinit var anonymousLoginButton: Button
+    //TODO Registration
+    private val loginField by bindView<EditText>(R.id.login_field)
+    private val passwordField by bindView<EditText>(R.id.password_field)
+    private val loginButton by bindView<Button>(R.id.login_button)
+    private val anonymousLoginButton  by bindView<Button>(R.id.anonymous_login_button)
 
-    lateinit var loginFieldSubscription: Subscription
-    lateinit var passwordFieldSubscription: Subscription
-    lateinit var loginButtonSubscription: Subscription
-    lateinit var anonymousLoginButtonSubscription: Subscription
+    //Flow control
+    lateinit private var userUpdateSubscription: Subscription
+
+    //Listeners
+    lateinit private var textFieldsSubscription: Subscription
+    lateinit private var loginButtonSubscription: Subscription
+    lateinit private var anonymousLoginButtonSubscription: Subscription
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
-        loginField = this.findViewById(R.id.login_field) as EditText
-        passwordField = this.findViewById(R.id.password_field) as EditText
-        loginButton = this.findViewById(R.id.login_button) as Button
-        anonymousLoginButton = this.findViewById(R.id.anonymous_login_button)as Button
     }
 
     override fun onResume() {
         super.onResume()
-        loginFieldSubscription = RxTextView.textChanges(loginField).subscribe({ b -> loginButtonStateChange() })
-        passwordFieldSubscription = RxTextView.textChanges(passwordField).subscribe({ b -> loginButtonStateChange() })
-        loginButtonSubscription = RxView.clicks(loginButton).subscribe { b -> auth() }
+        textFieldsSubscription = Observable.merge(RxTextView.textChanges(loginField), RxTextView.textChanges(passwordField))
+                .subscribe({ b -> loginButton.isEnabled = loginField.isNotEmpty() && passwordField.isNotEmpty() })
+        loginButtonSubscription = RxView.clicks(loginButton)
+                .subscribe { b -> UserController.auth(loginField.value(), passwordField.md5()) }
         //TODO Anonymous
-        anonymousLoginButtonSubscription = RxView.clicks(anonymousLoginButton).subscribe()
+        anonymousLoginButtonSubscription = RxView.clicks(anonymousLoginButton).subscribe { anonymousPressed() }
+        userUpdateSubscription = UserController.userUpdated.subscribe { success ->
+            if (success) {
+                PreferencesController.login = loginField.text.toString()
+                PreferencesController.passHash = passwordField.md5()
+                startActivity(Intent(this, ListActivity::class.java))
+            }
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        loginFieldSubscription.unsubscribe()
-        passwordFieldSubscription.unsubscribe()
+        textFieldsSubscription.unsubscribe()
         loginButtonSubscription.unsubscribe()
         anonymousLoginButtonSubscription.unsubscribe()
+        userUpdateSubscription.unsubscribe()
     }
 
-    private fun loginButtonStateChange() {
-        loginButton.isEnabled = loginField.text.isNotBlank() && passwordField.text.isNotBlank()
-    }
-
-    private fun auth() {
-        UserController.auth(loginField.text.toString(), MD5.digest(passwordField.text.toString()))
-                .subscribe { success ->
-                    if (success) {
-                        PreferencesController.login = loginField.text.toString()
-                        PreferencesController.passHash = MD5.digest(passwordField.text.toString())
-                        startActivity(Intent(this, ListActivity::class.java))
-                    }
+    fun anonymousPressed() {
+        AlertDialog.Builder(this)
+                .setMessage("Функционал создания событий и сообщений будет недоступен")
+                .setPositiveButton("ОК") { dialog, whichButton ->
+                    UserController.role = Role.ANONYMOUS
+                    startActivity(Intent(this, ListActivity::class.java))
                 }
+                .setNegativeButton("Войти и запомнить") { dialog, whichButton ->
+                    PreferencesController.anonymous = true
+                    UserController.role = Role.ANONYMOUS
+                    startActivity(Intent(this, ListActivity::class.java))
+                }.setNeutralButton("Отмена") { dialog, whichButton -> }
+                .create().show()
     }
 }

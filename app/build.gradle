@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
-
     defaultConfig {
         applicationId "info.motoaccident"
         minSdkVersion 15
@@ -34,7 +34,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
-//    compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.google.android.gms:play-services-gcm:9.0.1'
     compile 'com.google.android.gms:play-services-maps:9.0.1'
     compile 'com.google.android.gms:play-services-auth:9.0.1'
@@ -48,8 +47,28 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
     compile 'io.reactivex:rxkotlin:0.55.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
     compile 'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7-kotlin:0.4.0'
+    compile 'com.trello:rxlifecycle-kotlin:0.6.1'
+    compile "org.jetbrains.anko:anko-sdk15:$anko_version"
+    compile "org.jetbrains.anko:anko-support-v4:$anko_version"
+    compile "org.jetbrains.anko:anko-common:$anko_version"
+    compile "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
 }
 repositories {
     mavenCentral()
+}
+buildscript {
+    ext.kotlin_version = '1.0.2'
+    ext.anko_version = '0.8.3'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
+        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+    }
 }
