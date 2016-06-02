@@ -2,9 +2,6 @@ package info.motoaccident.dictionaries
 
 import com.google.gson.annotations.SerializedName
 
-/**
- * Created by rjhdby on 12.02.16.
- */
 enum class AccidentType internal constructor(private val text: String) {
     @SerializedName("b") BREAK("Поломка"),
     @SerializedName("1") SOLO("Один участник"),

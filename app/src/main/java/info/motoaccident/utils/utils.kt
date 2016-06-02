@@ -2,6 +2,7 @@ package info.motoaccident.utils
 
 import android.location.Location
 import android.text.format.DateFormat
+import android.view.View
 import android.widget.EditText
 import com.google.android.gms.maps.model.LatLng
 import java.security.MessageDigest
@@ -39,10 +40,14 @@ fun Long.asTimeIntervalFromCurrent(): Long = System.currentTimeMillis() / 1000 -
 fun Long.asAge(): String {
     val diff = System.currentTimeMillis() / 1000 - this
     when {
-        diff < 60 -> return diff.toString() + "с"
-        diff < 3600 -> return (diff / 60).toString() + "м"
+        diff < 60    -> return diff.toString() + "с"
+        diff < 3600  -> return (diff / 60).toString() + "м"
         diff < 14400 -> return (diff / 3600).toString() + "ч " + ((diff / 60) % 60).toString() + "м"
-        diff < 86400 -> return DateFormat.format("HH:MM", Date(this * 1000)).toString()
-        else -> return DateFormat.format("dd.MM.yy HH:MM", Date(this * 1000)).toString()
+        diff < 72000 -> return DateFormat.format("HH:mm", Date(this * 1000)).toString()
+        else         -> return DateFormat.format("dd.MM HH:mm", Date(this * 1000)).toString()
     }
+}
+
+fun View.visible(visibility: Boolean) {
+    this.visibility = if (visibility) View.VISIBLE else View.INVISIBLE
 }

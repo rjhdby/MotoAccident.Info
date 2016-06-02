@@ -1,14 +1,20 @@
 package info.motoaccident.controllers
 
+import info.motoaccident.dictionaries.AccidentDamage
+import info.motoaccident.dictionaries.AccidentStatus
+import info.motoaccident.dictionaries.AccidentType
+import info.motoaccident.dictionaries.Role
 import info.motoaccident.network.HttpRequestService
 import info.motoaccident.network.modeles.list.Point
+import info.motoaccident.utils.asTimeIntervalFromCurrent
+import info.motoaccident.utils.distance
 import rx.Observable
 import rx.subjects.PublishSubject
 import java.util.*
 
 object ContentController {
-    var points: List<Point> = ArrayList()
-    var contentUpdated: PublishSubject<Boolean> = PublishSubject.create()
+    private var points: List<Point> = ArrayList()
+    val contentUpdated: PublishSubject<Boolean> = PublishSubject.create()
     //TODO subscribe notifications
     //TODO subscribe accident created
     //TODO subscribe message created
@@ -29,7 +35,16 @@ object ContentController {
                            { e -> e.printStackTrace() })
     }
 
-    fun observePoints(): Observable<Point> {
-        return Observable.from(points)
+    fun observePoints(): Observable<List<Point>> {
+        return Observable.from(points).filter { p -> p.status != AccidentStatus.HIDDEN || (UserController.role == Role.MODERATOR || UserController.role == Role.DEVELOPER) }
+                .filter { p -> p.status != AccidentStatus.ENDED || PreferencesController.ended }
+                .filter { p -> p.type != AccidentType.OTHER || PreferencesController.other }
+                .filter { p -> p.type != AccidentType.BREAK || PreferencesController.breaks }
+                .filter { p -> p.type != AccidentType.STEAL || PreferencesController.steals }
+                .filter { p -> p.location.distance(PreferencesController.lastLocation) < PreferencesController.showRadius * 1000 }
+                .filter { p -> !p.isAccident() || PreferencesController.accidents }
+                .filter { p -> (p.med != AccidentDamage.HEAVY && p.med != AccidentDamage.LETHAL) || PreferencesController.heavy }
+                .filter { p -> p.time.asTimeIntervalFromCurrent() / 3600 < PreferencesController.maxAge }
+                .toList()
     }
 }

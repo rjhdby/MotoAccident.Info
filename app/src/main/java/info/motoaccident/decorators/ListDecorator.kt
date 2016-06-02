@@ -8,21 +8,16 @@ import android.view.ViewGroup
 import info.motoaccident.R
 import info.motoaccident.activity.ListActivityInterface
 import info.motoaccident.controllers.ContentController
+import info.motoaccident.controllers.PermissionController
 import info.motoaccident.controllers.PreferencesController
 import info.motoaccident.controllers.UserController
-import info.motoaccident.dictionaries.AccidentDamage
-import info.motoaccident.dictionaries.AccidentStatus
-import info.motoaccident.dictionaries.AccidentType
-import info.motoaccident.dictionaries.Role
 import info.motoaccident.network.modeles.list.Point
 import info.motoaccident.utils.asAge
-import info.motoaccident.utils.asTimeIntervalFromCurrent
 import info.motoaccident.utils.distance
+import info.motoaccident.utils.visible
 import kotlinx.android.synthetic.main.list_view_row.view.*
 import org.jetbrains.anko.onUiThread
-import rx.Observable
 import rx.Subscription
-import java.util.*
 
 object ListDecorator : ViewDecorator<ListActivityInterface> {
     lateinit private var target: ListActivityInterface
@@ -30,44 +25,36 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
     lateinit private var preferencesUpdateSubscription: Subscription
     lateinit private var roleUpdateSubscription: Subscription
 
+    lateinit private var listView: RecyclerView
+
     override fun start(target: ListActivityInterface) {
         this.target = target
         //TODO subscribe location update
         //TODO subscribe permission update
-        //TODO interface decorate
+        listView = (target.contentView() as RecyclerView)
         target.getContext().onUiThread {
-            target.listView().layoutManager = LinearLayoutManager(target.getContext(), LinearLayoutManager.VERTICAL, false)
+            listView.layoutManager = LinearLayoutManager(target.getContext(), LinearLayoutManager.VERTICAL, false)
         }
         updateInterface()
-        updateDataSet(ContentController.observePoints())
-        preferencesUpdateSubscription = PreferencesController.preferencesUpdated.subscribe { updateDataSet(ContentController.observePoints()) }
-        contentUpdateSubscription = ContentController.contentUpdated.subscribe { updateDataSet(ContentController.observePoints()) }
-        roleUpdateSubscription = UserController.userUpdated.subscribe { updateInterface(); updateDataSet(ContentController.observePoints()) }
+        updateDataSet()
+        preferencesUpdateSubscription = PreferencesController.preferencesUpdated.subscribe { updateDataSet() }
+        contentUpdateSubscription = ContentController.contentUpdated.subscribe { updateDataSet() }
+        roleUpdateSubscription = UserController.userUpdated.subscribe { updateInterface(); updateDataSet() }
         ContentController.reloadContent()
     }
 
-    private fun updateDataSet(observer: Observable<Point>) {
-        val list = ArrayList<Point>()
-        observer.filter { p -> p.status != AccidentStatus.HIDDEN || (UserController.role == Role.MODERATOR || UserController.role == Role.DEVELOPER) }
-                .filter { p -> p.status != AccidentStatus.ENDED || PreferencesController.ended }
-                .filter { p -> p.type != AccidentType.OTHER || PreferencesController.other }
-                .filter { p -> p.type != AccidentType.BREAK || PreferencesController.breaks }
-                .filter { p -> p.type != AccidentType.STEAL || PreferencesController.steals }
-                .filter { p -> p.location().distance(PreferencesController.lastLocation) < PreferencesController.showRadius * 1000 }
-                .filter { p -> !p.isAccident() || PreferencesController.accidents }
-                .filter { p -> (p.med != AccidentDamage.HEAVY && p.med != AccidentDamage.LETHAL) || PreferencesController.heavy }
-                .filter { p -> p.time.asTimeIntervalFromCurrent() / 3600 < PreferencesController.maxAge }
-                .subscribe ({ p -> list.add(p) }, { e -> e.printStackTrace() }, { refreshRecyclerView(list) })
-    }
+    private fun updateDataSet() = ContentController.observePoints().subscribe { list -> refreshRecyclerView(list) }
+
 
     private fun updateInterface() {
-
+        target.getPermittedResources()
+                .subscribe { p -> p.first.visible(PermissionController.check(p.second)) }
     }
 
-    private fun refreshRecyclerView(list: ArrayList<Point>) {
+    private fun refreshRecyclerView(list: List<Point>) {
         target.getContext().onUiThread {
-            target.listView().adapter = RecyclerViewAdapter(list)
-            target.listView().invalidate()
+            listView.adapter = RecyclerViewAdapter(list)
+            listView.invalidate()
         }
     }
 
@@ -79,7 +66,7 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
         //TODO unSubscribe permission update
     }
 
-    private class RecyclerViewAdapter(var list: ArrayList<Point>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+    private class RecyclerViewAdapter(var list: List<Point>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.list_view_row, parent, false)
@@ -95,14 +82,14 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
         }
 
         private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
             fun bind(point: Point) {
                 with(point) {
+//                    Log.d("POINT", id.toString() + " " + time.asAge())
                     itemView.address.text = address
                     itemView.owner.text = owner
                     itemView.description.text = description
                     itemView.age.text = time.asAge()
-                    itemView.distance.text = location().distance(PreferencesController.lastLocation).toString()
+                    itemView.distance.text = location.distance(PreferencesController.lastLocation).toString()
                 }
             }
         }

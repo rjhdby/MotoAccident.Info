@@ -33,6 +33,7 @@
                 android:layout_gravity="start|bottom"
                 android:maxLines="2"
                 android:text="description"/>
+
         </LinearLayout>
 
         <RelativeLayout
@@ -62,6 +63,8 @@
                 android:layout_below="@+id/owner"
                 android:maxLines="1"
                 android:text="age"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:gravity="center_vertical"/>
 
             <TextView

@@ -4,15 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.jakewharton.rxbinding.view.RxView
 import info.motoaccident.R
-import info.motoaccident.decorators.ListDecorator
+import info.motoaccident.decorators.MapDecorator
 import info.motoaccident.dictionaries.DEVELOPER
 import info.motoaccident.dictionaries.MODERATOR
 import info.motoaccident.dictionaries.PHONE
@@ -20,47 +22,76 @@ import info.motoaccident.dictionaries.STANDARD
 import info.motoaccident.utils.bindView
 import rx.Observable
 import rx.Subscription
+import rx.subjects.PublishSubject
 
-class ListActivity : AppCompatActivity(), ListActivityInterface {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterface {
     private val createAccidentButton by bindView<ImageButton>(R.id.create_acc)
     private val callButton by bindView<ImageButton>(R.id.call)
     private val toolbar by bindView<Toolbar>(R.id.toolbar)
 
+    lateinit private var mapFragment: SupportMapFragment
+
     lateinit private var callButtonSubscription: Subscription
     lateinit private var createAccidentButtonSubscription: Subscription
 
-    override fun getPermittedResources(): Observable<Pair<View, Int>> = Observable.just(
-            Pair(createAccidentButton, STANDARD or MODERATOR or DEVELOPER),
-            Pair(callButton, PHONE))
+    override val mapReady: PublishSubject<Boolean> = PublishSubject.create()
 
-    val listView by bindView<RecyclerView>(R.id.list_view)
+    private var map: GoogleMap? = null //TODO nullable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list)
+        setContentView(R.layout.activity_map)
+        mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.retainInstance = true
         setSupportActionBar(toolbar);
     }
 
     override fun onResume() {
         super.onResume()
-        ListDecorator.start(this)
+        MapDecorator.start(this)
+        if (map == null) mapFragment.getMapAsync(this)
+        else mapReady.onNext(true)
         callButtonSubscription = RxView.clicks(callButton).subscribe { callPressed() }
         createAccidentButtonSubscription = RxView.clicks(callButton).subscribe { createPressed() }
     }
 
     override fun onPause() {
         super.onPause()
-        ListDecorator.stop()
+        MapDecorator.stop()
         callButtonSubscription.unsubscribe()
         createAccidentButtonSubscription.unsubscribe()
     }
 
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        mapReady.onNext(true)
+    }
+
+    override fun contentView(): GoogleMap {
+        return map!!
+    }
+
+    override fun getContext(): Context = this
+
+    override fun getPermittedResources(): Observable<Pair<View, Int>> = Observable.just(
+            Pair(createAccidentButton, STANDARD or MODERATOR or DEVELOPER),
+            Pair(callButton, PHONE))
+
+    override fun runActivity(activity: Class<*>, bundle: Bundle) {
+        startActivity(Intent(this, activity).putExtras(bundle))
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_map     -> runActivity(MapActivity::class.java)
+            R.id.action_list     -> runActivity(ListActivity::class.java)
             R.id.action_settings -> runActivity(SettingsActivity::class.java)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.map_activity_toolbar, menu);
+        return true;
     }
 
     fun callPressed() {
@@ -70,17 +101,4 @@ class ListActivity : AppCompatActivity(), ListActivityInterface {
     fun createPressed() {
         //TODO implementation
     }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.list_activity_toolbar, menu);
-        return true;
-    }
-
-    override fun runActivity(activity: Class<*>, bundle: Bundle) {
-        startActivity(Intent(this, activity).putExtras(bundle))
-    }
-
-    override fun getContext(): Context = this
-
-    override fun contentView(): RecyclerView = listView
 }

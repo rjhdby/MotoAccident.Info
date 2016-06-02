@@ -31,30 +31,15 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_menu"
-        android:layout_below="@+id/toolbar"
-        android:paddingBottom="-23dp"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"/>
-
-    <LinearLayout
-        android:id="@+id/bottom_menu_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/bottom_menu"
-        android:layout_marginLeft="-23dp"
-        android:layout_marginRight="-23dp"
-        android:layout_marginTop="-16dp"
-        android:background="@drawable/material_shadow_z3"
-        android:orientation="horizontal">
-    </LinearLayout>
+    <fragment android:id="@+id/map"
+              android:name="com.google.android.gms.maps.SupportMapFragment"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_above="@+id/bottom_menu"
+              android:layout_below="@+id/toolbar"
+              tools:context="info.motoaccident.activity.MapActivity"/>
 
     <LinearLayout
         android:id="@+id/bottom_menu"

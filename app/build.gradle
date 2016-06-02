@@ -15,6 +15,10 @@ android {
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
     }
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "4g"
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -33,29 +37,28 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
+
+    compile "org.jetbrains.anko:anko-sdk15:$anko_version"
+    compile "org.jetbrains.anko:anko-common:$anko_version"
+    compile "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
+
+    compile 'io.reactivex:rxkotlin:0.55.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0'
+    compile 'com.trello:rxlifecycle-kotlin:0.6.1'
     compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.google.android.gms:play-services:9.0.1'
     compile 'com.google.android.gms:play-services-gcm:9.0.1'
     compile 'com.google.android.gms:play-services-maps:9.0.1'
-    compile 'com.google.android.gms:play-services-auth:9.0.1'
     compile 'com.google.android.gms:play-services-location:9.0.1'
-    compile 'io.reactivex:rxandroid:1.2.0'
-    compile 'io.reactivex:rxjava:1.1.5'
     compile 'com.squareup.retrofit2:retrofit:2.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
-    compile 'pl.charmas.android:android-reactive-location:0.9@aar'
     compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
-    compile 'io.reactivex:rxkotlin:0.55.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
-    compile 'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0'
     compile 'com.android.support:recyclerview-v7:23.4.0'
     compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7-kotlin:0.4.0'
-    compile 'com.trello:rxlifecycle-kotlin:0.6.1'
-    compile "org.jetbrains.anko:anko-sdk15:$anko_version"
-    compile "org.jetbrains.anko:anko-support-v4:$anko_version"
-    compile "org.jetbrains.anko:anko-common:$anko_version"
-    compile "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
+    compile 'com.android.support:support-v4:23.4.0'
 }
 repositories {
     mavenCentral()

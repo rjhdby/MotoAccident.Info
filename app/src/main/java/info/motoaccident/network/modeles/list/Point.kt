@@ -23,14 +23,14 @@ class Point {
     @SerializedName("v") var volunteers: List<Volunteer> = ArrayList()
     @SerializedName("h") var history: List<History> = ArrayList()
 
-    fun location(): LatLng {
-        return LatLng(lat.toDouble(), lon.toDouble())
-    }
+    var location: LatLng = LatLng(lat.toDouble(), lon.toDouble())
+        get() = LatLng(lat.toDouble(), lon.toDouble())
+        private set
 
     fun isAccident(): Boolean {
         when (type) {
             AccidentType.MOTO_AUTO, AccidentType.MOTO_MAN, AccidentType.MOTO_MOTO, AccidentType.SOLO -> return true
-            else -> return false
+            else                                                                                     -> return false
         }
     }
 }
