@@ -18,6 +18,7 @@ import info.motoaccident.dictionaries.MODERATOR
 import info.motoaccident.dictionaries.PHONE
 import info.motoaccident.dictionaries.STANDARD
 import info.motoaccident.utils.bindView
+import info.motoaccident.utils.runActivity
 import rx.Observable
 import rx.Subscription
 
@@ -57,7 +58,7 @@ class ListActivity : AppCompatActivity(), ListActivityInterface {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_map     -> runActivity(MapActivity::class.java)
+            R.id.action_map      -> runActivity(MapActivity::class.java)
             R.id.action_settings -> runActivity(SettingsActivity::class.java)
         }
         return super.onOptionsItemSelected(item)
@@ -76,11 +77,14 @@ class ListActivity : AppCompatActivity(), ListActivityInterface {
         return true;
     }
 
-    override fun runActivity(activity: Class<*>, bundle: Bundle) {
-        startActivity(Intent(this, activity).putExtras(bundle))
-    }
+    override fun contentView(): RecyclerView = listView
 
     override fun getContext(): Context = this
 
-    override fun contentView(): RecyclerView = listView
+    override fun onBackPressed() {
+        val backToHome: Intent = Intent(Intent.ACTION_MAIN);
+        backToHome.addCategory(Intent.CATEGORY_HOME);
+        backToHome.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+        startActivity(backToHome);
+    }
 }

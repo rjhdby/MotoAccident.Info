@@ -20,6 +20,7 @@ import info.motoaccident.dictionaries.MODERATOR
 import info.motoaccident.dictionaries.PHONE
 import info.motoaccident.dictionaries.STANDARD
 import info.motoaccident.utils.bindView
+import info.motoaccident.utils.runActivity
 import rx.Observable
 import rx.Subscription
 import rx.subjects.PublishSubject
@@ -71,15 +72,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
         return map!!
     }
 
-    override fun getContext(): Context = this
 
     override fun getPermittedResources(): Observable<Pair<View, Int>> = Observable.just(
             Pair(createAccidentButton, STANDARD or MODERATOR or DEVELOPER),
             Pair(callButton, PHONE))
-
-    override fun runActivity(activity: Class<*>, bundle: Bundle) {
-        startActivity(Intent(this, activity).putExtras(bundle))
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -100,5 +96,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
 
     fun createPressed() {
         //TODO implementation
+    }
+
+    override fun getContext(): Context = this
+
+    override fun onBackPressed() {
+        val backToHome: Intent = Intent(Intent.ACTION_MAIN);
+        backToHome.addCategory(Intent.CATEGORY_HOME);
+        backToHome.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+        startActivity(backToHome);
     }
 }

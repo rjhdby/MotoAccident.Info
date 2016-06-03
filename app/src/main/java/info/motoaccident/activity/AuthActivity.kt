@@ -12,10 +12,7 @@ import info.motoaccident.R
 import info.motoaccident.controllers.PreferencesController
 import info.motoaccident.controllers.UserController
 import info.motoaccident.dictionaries.Role
-import info.motoaccident.utils.bindView
-import info.motoaccident.utils.isNotEmpty
-import info.motoaccident.utils.md5
-import info.motoaccident.utils.value
+import info.motoaccident.utils.*
 import rx.Observable
 import rx.Subscription
 
@@ -51,7 +48,7 @@ class AuthActivity : AppCompatActivity() {
             if (success) {
                 PreferencesController.login = loginField.text.toString()
                 PreferencesController.passHash = passwordField.md5()
-                startActivity(Intent(this, ListActivity::class.java))
+                runActivity(ListActivity::class.java)
             }
         }
     }

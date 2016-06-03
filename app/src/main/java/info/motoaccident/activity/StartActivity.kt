@@ -1,11 +1,11 @@
 package info.motoaccident.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import info.motoaccident.R
 import info.motoaccident.controllers.ContentController
 import info.motoaccident.controllers.UserController
+import info.motoaccident.utils.runActivity
 import rx.Subscription
 
 class StartActivity : AppCompatActivity() {
@@ -16,8 +16,8 @@ class StartActivity : AppCompatActivity() {
         setContentView(R.layout.activity_start)
         ContentController.reloadContent()
         userUpdateSubscription = UserController.userUpdated.subscribe { success ->
-            if (success) startActivity(Intent(this, ListActivity::class.java))
-            else startActivity(Intent(this, AuthActivity::class.java))
+            if (success) runActivity(ListActivity::class.java)
+            else runActivity(AuthActivity::class.java)
         }
         UserController.auth()
     }

@@ -45,7 +45,6 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
 
     private fun updateDataSet() = ContentController.observePoints().subscribe { list -> refreshRecyclerView(list) }
 
-
     private fun updateInterface() {
         target.getPermittedResources()
                 .subscribe { p -> p.first.visible(PermissionController.check(p.second)) }
@@ -84,7 +83,6 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
         private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             fun bind(point: Point) {
                 with(point) {
-//                    Log.d("POINT", id.toString() + " " + time.asAge())
                     itemView.address.text = address
                     itemView.owner.text = owner
                     itemView.description.text = description

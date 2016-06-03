@@ -1,6 +1,9 @@
 package info.motoaccident.utils
 
+import android.content.Intent
 import android.location.Location
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.text.format.DateFormat
 import android.view.View
 import android.widget.EditText
@@ -51,3 +54,11 @@ fun Long.asAge(): String {
 fun View.visible(visibility: Boolean) {
     this.visibility = if (visibility) View.VISIBLE else View.INVISIBLE
 }
+
+fun AppCompatActivity.runActivity(activity: Class<*>, bundle: Bundle = Bundle.EMPTY) {
+    startActivity(Intent(this, activity)
+                          .putExtras(bundle)
+                          .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                 )
+}
+
