@@ -1,26 +1,21 @@
 package info.motoaccident.activity
 
 
+import android.R.id.home
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.preference.ListPreference
-import android.preference.Preference
-import android.preference.PreferenceActivity
-import android.support.v7.app.ActionBar
-import android.preference.PreferenceFragment
-import android.preference.PreferenceManager
-import android.preference.RingtonePreference
+import android.preference.*
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.MenuItem
-
 import info.motoaccident.R
+import info.motoaccident.utils.bindView
 
 /**
  * A [PreferenceActivity] that presents a set of application settings. On
@@ -34,18 +29,17 @@ import info.motoaccident.R
    * API Guide](http://developer.android.com/guide/topics/ui/settings.html) for more information on developing a Settings UI.
  */
 class SettingsActivity : AppCompatPreferenceActivity() {
-
+    private val toolbar by bindView<Toolbar>(R.id.toolbar)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupActionBar()
+        //setupActionBar()
     }
 
     /**
      * Set up the [android.app.ActionBar], if the API is available.
      */
     private fun setupActionBar() {
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        setSupportActionBar(toolbar);
     }
 
     /**
@@ -95,7 +89,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             val id = item.itemId
-            if (id == android.R.id.home) {
+            if (id == home) {
                 startActivity(Intent(activity, SettingsActivity::class.java))
                 return true
             }
@@ -123,7 +117,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             val id = item.itemId
-            if (id == android.R.id.home) {
+            if (id == home) {
                 startActivity(Intent(activity, SettingsActivity::class.java))
                 return true
             }
@@ -151,7 +145,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {
             val id = item.itemId
-            if (id == android.R.id.home) {
+            if (id == home) {
                 startActivity(Intent(activity, SettingsActivity::class.java))
                 return true
             }

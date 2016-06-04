@@ -4,22 +4,16 @@ package info.motoaccident.utils
  * https://github.com/JakeWharton/kotterknife
  */
 import android.app.Activity
-import android.app.Dialog
-import android.app.Fragment
-import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.View
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import android.support.v4.app.Fragment as SupportFragment
 
-//public fun <V : View> View.bindView(id: Int)
-//        : ReadOnlyProperty<View, V> = required(id, viewFinder)
+//public fun <V : View> View.bindView(id: Int) : ReadOnlyProperty<View, V> = required(id, viewFinder)
 
-public fun <V : View> Activity.bindView(id: Int)
-        : ReadOnlyProperty<Activity, V> = required(id, viewFinder)
+fun <V : View> bindView(id: Int): ReadOnlyProperty<Activity, V> = required(id, viewFinder)
 //
-//public fun <V : View> Dialog.bindView(id: Int)
-//        : ReadOnlyProperty<Dialog, V> = required(id, viewFinder)
+//public fun <V : View> Dialog.bindView(id: Int): ReadOnlyProperty<Dialog, V> = required(id, viewFinder)
 //
 //public fun <V : View> Fragment.bindView(id: Int)
 //        : ReadOnlyProperty<Fragment, V> = required(id, viewFinder)
@@ -86,7 +80,7 @@ public fun <V : View> Activity.bindView(id: Int)
 
 //private val View.viewFinder: View.(Int) -> View?
 //    get() = { findViewById(it) }
-private val Activity.viewFinder: Activity.(Int) -> View?
+private val viewFinder: Activity.(Int) -> View?
     get() = { findViewById(it) }
 //private val Dialog.viewFinder: Dialog.(Int) -> View?
 //    get() = { findViewById(it) }
@@ -97,20 +91,17 @@ private val Activity.viewFinder: Activity.(Int) -> View?
 //private val ViewHolder.viewFinder: ViewHolder.(Int) -> View?
 //    get() = { itemView.findViewById(it) }
 
-private fun viewNotFound(id: Int, desc: KProperty<*>): Nothing =
-        throw IllegalStateException("View ID $id for '${desc.name}' not found.")
+private fun viewNotFound(id: Int, desc: KProperty<*>): Nothing = throw IllegalStateException("View ID $id for '${desc.name}' not found.")
 
 @Suppress("UNCHECKED_CAST")
-private fun <T, V : View> required(id: Int, finder: T.(Int) -> View?)
-        = Lazy { t: T, desc -> t.finder(id) as V? ?: viewNotFound(id, desc) }
+private fun <T, V : View> required(id: Int, finder: T.(Int) -> View?) = Lazy { t: T, desc -> t.finder(id) as V? ?: viewNotFound(id, desc) }
 //
 //@Suppress("UNCHECKED_CAST")
 //private fun <T, V : View> optional(id: Int, finder: T.(Int) -> View?)
 //        = Lazy { t: T, desc -> t.finder(id) as V? }
 
-@Suppress("UNCHECKED_CAST")
-private fun <T, V : View> required(ids: IntArray, finder: T.(Int) -> View?)
-        = Lazy { t: T, desc -> ids.map { t.finder(it) as V? ?: viewNotFound(it, desc) } }
+//@Suppress("UNCHECKED_CAST")
+//private fun <T, V : View> required(ids: IntArray, finder: T.(Int) -> View?) = Lazy { t: T, desc -> ids.map { t.finder(it) as V? ?: viewNotFound(it, desc) } }
 //
 //@Suppress("UNCHECKED_CAST")
 //private fun <T, V : View> optional(ids: IntArray, finder: T.(Int) -> View?)

@@ -13,6 +13,7 @@ import info.motoaccident.controllers.PreferencesController
 import info.motoaccident.controllers.UserController
 import info.motoaccident.network.modeles.list.Point
 import info.motoaccident.utils.asAge
+import info.motoaccident.utils.asDistance
 import info.motoaccident.utils.distance
 import info.motoaccident.utils.visible
 import kotlinx.android.synthetic.main.list_view_row.view.*
@@ -83,11 +84,12 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
         private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             fun bind(point: Point) {
                 with(point) {
+                    //TODO type, medicine, owner
                     itemView.address.text = address
                     itemView.owner.text = owner
                     itemView.description.text = description
                     itemView.age.text = time.asAge()
-                    itemView.distance.text = location.distance(PreferencesController.lastLocation).toString()
+                    itemView.distance.text = location.distance(PreferencesController.lastLocation).asDistance()
                 }
             }
         }

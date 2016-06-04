@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.EditText
 import com.google.android.gms.maps.model.LatLng
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.util.*
 
 fun LatLng.distance(flatLng: LatLng): Float {
@@ -21,19 +20,12 @@ fun LatLng.distance(flatLng: LatLng): Float {
 }
 
 fun String.md5(): String {
-    try {
-        val md = MessageDigest.getInstance("MD5")
-        md.update(this.toByteArray())
-        val digest = md.digest()
-        val sb = StringBuilder()
-        for (b in digest) {
-            sb.append(String.format("%02x", b))
-        }
-        return sb.toString()
-    } catch (e: NoSuchAlgorithmException) {
-        e.printStackTrace()
-        return ""
-    }
+    val md = MessageDigest.getInstance("MD5")
+    md.update(this.toByteArray())
+    val digest = md.digest()
+    val sb = StringBuilder()
+    for (b in digest) sb.append(String.format("%02x", b))
+    return sb.toString()
 }
 
 fun EditText.md5(): String = this.text.toString().md5()
@@ -51,14 +43,15 @@ fun Long.asAge(): String {
     }
 }
 
+fun Float.asDistance(): String {
+    if (this < 1000) return toInt().toString() + "м"
+    else return Math.round(this / 1000).toString() + "км"
+}
+
 fun View.visible(visibility: Boolean) {
     this.visibility = if (visibility) View.VISIBLE else View.INVISIBLE
 }
 
 fun AppCompatActivity.runActivity(activity: Class<*>, bundle: Bundle = Bundle.EMPTY) {
-    startActivity(Intent(this, activity)
-                          .putExtras(bundle)
-                          .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                 )
+    startActivity(Intent(this, activity).putExtras(bundle).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
 }
-
