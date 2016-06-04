@@ -22,14 +22,17 @@ import info.motoaccident.utils.bindView
 import info.motoaccident.utils.runActivity
 import rx.Observable
 import rx.Subscription
+import rx.subjects.PublishSubject
 
-class ListActivity : AppCompatActivity(), ListActivityInterface {
+class ListActivity : AppCompatActivity(), ActivityInterface<RecyclerView> {
     private val createAccidentButton by bindView<ImageButton>(R.id.create_acc)
     private val callButton by bindView<ImageButton>(R.id.call)
     private val toolbar by bindView<Toolbar>(R.id.toolbar)
 
     lateinit private var callButtonSubscription: Subscription
     lateinit private var createAccidentButtonSubscription: Subscription
+
+    override val readyForDecorate: PublishSubject<Boolean> = PublishSubject.create()
 
     override fun getPermittedResources(): Observable<Pair<View, Int>> = Observable.just(
             Pair(createAccidentButton, STANDARD or MODERATOR or DEVELOPER),

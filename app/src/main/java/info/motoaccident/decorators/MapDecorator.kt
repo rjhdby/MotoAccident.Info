@@ -4,7 +4,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import info.motoaccident.R
-import info.motoaccident.activity.MapActivityInterface
+import info.motoaccident.activity.ActivityInterface
 import info.motoaccident.controllers.ContentController
 import info.motoaccident.controllers.PermissionController
 import info.motoaccident.controllers.PreferencesController
@@ -13,8 +13,8 @@ import info.motoaccident.network.modeles.list.Point
 import info.motoaccident.utils.visible
 import rx.Subscription
 
-object MapDecorator : ViewDecorator<MapActivityInterface> {
-    lateinit private var target: MapActivityInterface
+object MapDecorator : ViewDecorator<ActivityInterface<GoogleMap>> {
+    lateinit private var target: ActivityInterface<GoogleMap>
     lateinit private var map: GoogleMap
 
     lateinit private var mapReadySubscription: Subscription
@@ -22,10 +22,10 @@ object MapDecorator : ViewDecorator<MapActivityInterface> {
     lateinit private var preferencesUpdateSubscription: Subscription
     lateinit private var roleUpdateSubscription: Subscription
 
-    override fun start(target: MapActivityInterface) {
+    override fun start(target: ActivityInterface<GoogleMap>) {
         this.target = target
         updateInterface()
-        mapReadySubscription = target.mapReady.take(1).subscribe { p -> realStart() }
+        mapReadySubscription = target.readyForDecorate.take(1).subscribe { p -> realStart() }
     }
 
     private fun realStart() {
@@ -47,11 +47,14 @@ object MapDecorator : ViewDecorator<MapActivityInterface> {
         }
     }
 
-    private fun updateDataSet() = ContentController.observePoints().subscribe { list -> refreshMap(list) }
+    private fun updateDataSet() {
+        ContentController.observePoints().subscribe { list -> refreshMap(list) }
+    }
 
     private fun refreshMap(list: List<Point>) {
         map.clear()
         for (point in list) {
+            //TODO move to MarkerController
             val markerOptions = MarkerOptions()
                     .position(point.location)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.camera_small)) //TODO icons

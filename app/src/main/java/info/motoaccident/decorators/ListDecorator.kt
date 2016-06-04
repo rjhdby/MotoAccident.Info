@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import info.motoaccident.R
-import info.motoaccident.activity.ListActivityInterface
+import info.motoaccident.activity.ActivityInterface
 import info.motoaccident.controllers.*
 import info.motoaccident.network.modeles.list.Point
 import info.motoaccident.utils.asAge
@@ -17,8 +17,8 @@ import kotlinx.android.synthetic.main.list_view_row.view.*
 import org.jetbrains.anko.onUiThread
 import rx.Subscription
 
-object ListDecorator : ViewDecorator<ListActivityInterface> {
-    lateinit private var target: ListActivityInterface
+object ListDecorator : ViewDecorator<ActivityInterface<RecyclerView>> {
+    lateinit private var target: ActivityInterface<RecyclerView>
     lateinit private var contentUpdateSubscription: Subscription
     lateinit private var preferencesUpdateSubscription: Subscription
     lateinit private var roleUpdateSubscription: Subscription
@@ -26,11 +26,11 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
 
     lateinit private var listView: RecyclerView
 
-    override fun start(target: ListActivityInterface) {
+    override fun start(target: ActivityInterface<RecyclerView>) {
         this.target = target
         locationUpdateSubscription = LocationController.locationUpdated.subscribe { updateDataSet() }
         //TODO subscribe permission update
-        listView = (target.contentView() as RecyclerView)
+        listView = target.contentView()
         target.getContext().onUiThread {
             listView.layoutManager = LinearLayoutManager(target.getContext(), LinearLayoutManager.VERTICAL, false)
         }

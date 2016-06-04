@@ -27,7 +27,7 @@ import rx.Observable
 import rx.Subscription
 import rx.subjects.PublishSubject
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterface {
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, ActivityInterface<GoogleMap> {
     private val createAccidentButton by bindView<ImageButton>(R.id.create_acc)
     private val callButton by bindView<ImageButton>(R.id.call)
     private val toolbar by bindView<Toolbar>(R.id.toolbar)
@@ -37,9 +37,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
     lateinit private var callButtonSubscription: Subscription
     lateinit private var createAccidentButtonSubscription: Subscription
 
-    override val mapReady: PublishSubject<Boolean> = PublishSubject.create()
+    override val readyForDecorate: PublishSubject<Boolean> = PublishSubject.create()
 
-    private var map: GoogleMap? = null //TODO nullable
+    private var map: GoogleMap? = null //TODO move to MapDecorator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +54,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
         MyApplication.currentActivity.onNext(this)
         MapDecorator.start(this)
         if (map == null) mapFragment.getMapAsync(this)
-        else mapReady.onNext(true)
+        else readyForDecorate.onNext(true)
         callButtonSubscription = RxView.clicks(callButton).subscribe { callPressed() }
         createAccidentButtonSubscription = RxView.clicks(callButton).subscribe { createPressed() }
     }
@@ -71,13 +71,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
         map = googleMap
         LocationController.locationEnabled.take(1).subscribe { b -> if (b) map!!.isMyLocationEnabled = true }
         LocationController.requestPermission(this)
-        mapReady.onNext(true)
+        readyForDecorate.onNext(true)
     }
 
     override fun contentView(): GoogleMap {
         return map!!
     }
-
 
     override fun getPermittedResources(): Observable<Pair<View, Int>> = Observable.just(
             Pair(createAccidentButton, STANDARD or MODERATOR or DEVELOPER),

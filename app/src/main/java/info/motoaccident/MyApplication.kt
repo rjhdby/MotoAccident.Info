@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.support.multidex.MultiDex
-import android.util.Log
 import info.motoaccident.controllers.LocationController
 import rx.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
@@ -25,7 +24,7 @@ class MyApplication : Application() {
         super.onCreate()
         context = applicationContext
         LocationController.start()
-        statusSubscription.debounce(2, TimeUnit.SECONDS).filter { b -> b != currentStatus }.subscribe { b -> currentStatus = b;onForeground.onNext(b);Log.d("STATUS",b.toString()) }
+        statusSubscription.debounce(2, TimeUnit.SECONDS).filter { b -> b != currentStatus }.subscribe { b -> currentStatus = b;onForeground.onNext(b) }
         currentActivity.subscribe { a -> activity = a;statusSubscription.onNext(a != null) }
     }
 
