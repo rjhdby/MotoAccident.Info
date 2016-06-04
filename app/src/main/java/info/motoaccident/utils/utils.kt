@@ -14,8 +14,8 @@ import java.util.*
 fun LatLng.distance(flatLng: LatLng): Float {
     val results = FloatArray(3, { i -> 0f })
     Location.distanceBetween(this.latitude, this.longitude,
-                             flatLng.latitude, flatLng.longitude,
-                             results);
+            flatLng.latitude, flatLng.longitude,
+            results);
     return results[0]
 }
 
@@ -35,11 +35,11 @@ fun Long.asTimeIntervalFromCurrent(): Long = System.currentTimeMillis() / 1000 -
 fun Long.asAge(): String {
     val diff = System.currentTimeMillis() / 1000 - this
     when {
-        diff < 60    -> return diff.toString() + "с"
-        diff < 3600  -> return (diff / 60).toString() + "м"
+        diff < 60 -> return diff.toString() + "с"
+        diff < 3600 -> return (diff / 60).toString() + "м"
         diff < 14400 -> return (diff / 3600).toString() + "ч " + ((diff / 60) % 60).toString() + "м"
         diff < 72000 -> return DateFormat.format("HH:mm", Date(this * 1000)).toString()
-        else         -> return DateFormat.format("dd.MM HH:mm", Date(this * 1000)).toString()
+        else -> return DateFormat.format("dd.MM HH:mm", Date(this * 1000)).toString()
     }
 }
 
@@ -55,3 +55,5 @@ fun View.visible(visibility: Boolean) {
 fun AppCompatActivity.runActivity(activity: Class<*>, bundle: Bundle = Bundle.EMPTY) {
     startActivity(Intent(this, activity).putExtras(bundle).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
 }
+
+fun Location.latLng(): LatLng = LatLng(this.latitude, this.longitude)

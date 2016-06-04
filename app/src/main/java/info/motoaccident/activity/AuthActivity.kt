@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import com.jakewharton.rxbinding.view.RxView
 import com.jakewharton.rxbinding.widget.RxTextView
+import info.motoaccident.MyApplication
 import info.motoaccident.R
 import info.motoaccident.controllers.PreferencesController
 import info.motoaccident.controllers.UserController
@@ -38,6 +39,7 @@ class AuthActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+//        MyApplication.currentActivity.onNext(this)
         textFieldsSubscription = Observable.merge(RxTextView.textChanges(loginField), RxTextView.textChanges(passwordField))
                 .subscribe({ b -> loginButton.isEnabled = loginField.isNotEmpty() && passwordField.isNotEmpty() })
         loginButtonSubscription = RxView.clicks(loginButton)
@@ -59,6 +61,7 @@ class AuthActivity : AppCompatActivity() {
         loginButtonSubscription.unsubscribe()
         anonymousLoginButtonSubscription.unsubscribe()
         userUpdateSubscription.unsubscribe()
+//        MyApplication.currentActivity.onNext(null)
     }
 
     fun anonymousPressed() {

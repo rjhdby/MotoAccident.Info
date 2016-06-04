@@ -41,7 +41,7 @@ object ContentController {
                 .filter { p -> p.type != AccidentType.OTHER || PreferencesController.other }
                 .filter { p -> p.type != AccidentType.BREAK || PreferencesController.breaks }
                 .filter { p -> p.type != AccidentType.STEAL || PreferencesController.steals }
-                .filter { p -> p.location.distance(PreferencesController.lastLocation) < PreferencesController.showRadius * 1000 }
+                .filter { p -> p.location.distance(LocationController.lastLocation) < PreferencesController.showRadius * 1000 }
                 .filter { p -> !p.isAccident() || PreferencesController.accidents }
                 .filter { p -> (p.med != AccidentDamage.HEAVY && p.med != AccidentDamage.LETHAL) || PreferencesController.heavy }
                 .filter { p -> p.time.asTimeIntervalFromCurrent() / 3600 < PreferencesController.maxAge }

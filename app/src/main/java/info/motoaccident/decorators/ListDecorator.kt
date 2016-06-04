@@ -7,10 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import info.motoaccident.R
 import info.motoaccident.activity.ListActivityInterface
-import info.motoaccident.controllers.ContentController
-import info.motoaccident.controllers.PermissionController
-import info.motoaccident.controllers.PreferencesController
-import info.motoaccident.controllers.UserController
+import info.motoaccident.controllers.*
 import info.motoaccident.network.modeles.list.Point
 import info.motoaccident.utils.asAge
 import info.motoaccident.utils.asDistance
@@ -25,12 +22,13 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
     lateinit private var contentUpdateSubscription: Subscription
     lateinit private var preferencesUpdateSubscription: Subscription
     lateinit private var roleUpdateSubscription: Subscription
+    lateinit private var locationUpdateSubscription: Subscription
 
     lateinit private var listView: RecyclerView
 
     override fun start(target: ListActivityInterface) {
         this.target = target
-        //TODO subscribe location update
+        locationUpdateSubscription = LocationController.locationUpdated.subscribe { updateDataSet() }
         //TODO subscribe permission update
         listView = (target.contentView() as RecyclerView)
         target.getContext().onUiThread {
@@ -62,7 +60,7 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
         contentUpdateSubscription.unsubscribe()
         preferencesUpdateSubscription.unsubscribe()
         roleUpdateSubscription.unsubscribe()
-        //TODO unSubscribe location update
+        locationUpdateSubscription.unsubscribe()
         //TODO unSubscribe permission update
     }
 
@@ -89,7 +87,7 @@ object ListDecorator : ViewDecorator<ListActivityInterface> {
                     itemView.owner.text = owner
                     itemView.description.text = description
                     itemView.age.text = time.asAge()
-                    itemView.distance.text = location.distance(PreferencesController.lastLocation).asDistance()
+                    itemView.distance.text = location.distance(LocationController.lastLocation).asDistance()
                 }
             }
         }

@@ -14,6 +14,7 @@ import android.preference.*
 import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.MenuItem
+import info.motoaccident.MyApplication
 import info.motoaccident.R
 import info.motoaccident.utils.bindView
 
@@ -33,6 +34,16 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setupActionBar()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MyApplication.currentActivity.onNext(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MyApplication.currentActivity.onNext(null)
     }
 
     /**

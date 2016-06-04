@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import com.jakewharton.rxbinding.view.RxView
+import info.motoaccident.MyApplication
 import info.motoaccident.R
 import info.motoaccident.decorators.ListDecorator
 import info.motoaccident.dictionaries.DEVELOPER
@@ -44,6 +45,7 @@ class ListActivity : AppCompatActivity(), ListActivityInterface {
 
     override fun onResume() {
         super.onResume()
+        MyApplication.currentActivity.onNext(this)
         ListDecorator.start(this)
         callButtonSubscription = RxView.clicks(callButton).subscribe { callPressed() }
         createAccidentButtonSubscription = RxView.clicks(callButton).subscribe { createPressed() }
@@ -54,11 +56,12 @@ class ListActivity : AppCompatActivity(), ListActivityInterface {
         ListDecorator.stop()
         callButtonSubscription.unsubscribe()
         createAccidentButtonSubscription.unsubscribe()
+        MyApplication.currentActivity.onNext(null)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_map      -> runActivity(MapActivity::class.java)
+            R.id.action_map -> runActivity(MapActivity::class.java)
             R.id.action_settings -> runActivity(SettingsActivity::class.java)
         }
         return super.onOptionsItemSelected(item)

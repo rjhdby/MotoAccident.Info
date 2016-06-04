@@ -13,7 +13,9 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.jakewharton.rxbinding.view.RxView
+import info.motoaccident.MyApplication
 import info.motoaccident.R
+import info.motoaccident.controllers.LocationController
 import info.motoaccident.decorators.MapDecorator
 import info.motoaccident.dictionaries.DEVELOPER
 import info.motoaccident.dictionaries.MODERATOR
@@ -49,6 +51,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
 
     override fun onResume() {
         super.onResume()
+        MyApplication.currentActivity.onNext(this)
         MapDecorator.start(this)
         if (map == null) mapFragment.getMapAsync(this)
         else mapReady.onNext(true)
@@ -61,10 +64,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
         MapDecorator.stop()
         callButtonSubscription.unsubscribe()
         createAccidentButtonSubscription.unsubscribe()
+        MyApplication.currentActivity.onNext(null)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        LocationController.locationEnabled.take(1).subscribe { b -> if (b) map!!.isMyLocationEnabled = true }
+        LocationController.requestPermission(this)
         mapReady.onNext(true)
     }
 
@@ -79,7 +85,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, MapActivityInterfac
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_list     -> runActivity(ListActivity::class.java)
+            R.id.action_list -> runActivity(ListActivity::class.java)
             R.id.action_settings -> runActivity(SettingsActivity::class.java)
         }
         return super.onOptionsItemSelected(item)

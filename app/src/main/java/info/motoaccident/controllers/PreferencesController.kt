@@ -21,6 +21,10 @@ object PreferencesController {
         get() = preferences.getString("passHash", "")
         set(value) = preferences.edit().putString("passHash", value).apply()
 
+    var locationEnabled: Boolean
+        get() = preferences.getBoolean("location", true)
+        set(value) = preferences.edit().putBoolean("location", value).apply()
+
     var lastLocation: LatLng
         get() = LatLng(preferences.getFloat("lat", 55.752295f).toDouble(), preferences.getFloat("lon", 37.622735f).toDouble())
         set(value) = preferences.edit()
