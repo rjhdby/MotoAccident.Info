@@ -34,9 +34,9 @@ class ListActivity : AppCompatActivity(), ActivityInterface<RecyclerView> {
 
     override val readyForDecorate: PublishSubject<Boolean> = PublishSubject.create()
 
-    override fun getPermittedResources(): Observable<Pair<View, Int>> = Observable.just(
-            Pair(createAccidentButton, STANDARD or MODERATOR or DEVELOPER),
-            Pair(callButton, PHONE))
+    override fun getPermittedResources() = Observable.just(
+            Pair(createAccidentButton as View, STANDARD or MODERATOR or DEVELOPER),
+            Pair(callButton as View, PHONE))
 
     val listView by bindView<RecyclerView>(R.id.list_view)
 
