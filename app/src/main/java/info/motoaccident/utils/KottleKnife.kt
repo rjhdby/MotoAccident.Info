@@ -4,7 +4,9 @@ package info.motoaccident.utils
  * https://github.com/JakeWharton/kotterknife
  */
 import android.app.Activity
+import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.google.android.gms.maps.SupportMapFragment
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import android.support.v4.app.Fragment as SupportFragment
@@ -12,6 +14,8 @@ import android.support.v4.app.Fragment as SupportFragment
 //public fun <V : View> View.bindView(id: Int) : ReadOnlyProperty<View, V> = required(id, viewFinder)
 
 fun <V : View> bindView(id: Int): ReadOnlyProperty<Activity, V> = required(id, viewFinder)
+
+fun <F : SupportMapFragment> bindMapFragment(id: Int): ReadOnlyProperty<AppCompatActivity, F> = fragment(id, fragmentFinder)
 //
 //public fun <V : View> Dialog.bindView(id: Int): ReadOnlyProperty<Dialog, V> = required(id, viewFinder)
 //
@@ -82,6 +86,10 @@ fun <V : View> bindView(id: Int): ReadOnlyProperty<Activity, V> = required(id, v
 //    get() = { findViewById(it) }
 private val viewFinder: Activity.(Int) -> View?
     get() = { findViewById(it) }
+
+private val fragmentFinder: AppCompatActivity.(Int) -> SupportMapFragment?
+    get() = { supportFragmentManager.findFragmentById(it) as SupportMapFragment }
+
 //private val Dialog.viewFinder: Dialog.(Int) -> View?
 //    get() = { findViewById(it) }
 //private val Fragment.viewFinder: Fragment.(Int) -> View?
@@ -95,6 +103,10 @@ private fun viewNotFound(id: Int, desc: KProperty<*>): Nothing = throw IllegalSt
 
 @Suppress("UNCHECKED_CAST")
 private fun <T, V : View> required(id: Int, finder: T.(Int) -> View?) = Lazy { t: T, desc -> t.finder(id) as V? ?: viewNotFound(id, desc) }
+
+@Suppress("UNCHECKED_CAST")
+private fun <T, F : SupportMapFragment> fragment(id: Int, finder: T.(Int) -> SupportMapFragment?) = Lazy { t: T, desc -> t.finder(id) as F? ?: viewNotFound(id, desc) }
+//
 //
 //@Suppress("UNCHECKED_CAST")
 //private fun <T, V : View> optional(id: Int, finder: T.(Int) -> View?)

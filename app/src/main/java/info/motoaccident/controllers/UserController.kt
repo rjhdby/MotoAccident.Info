@@ -7,7 +7,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.subjects.PublishSubject
 
 object UserController {
-    var roleUpdated: PublishSubject<Boolean> = PublishSubject.create()
+    val roleUpdated: PublishSubject<Boolean> = PublishSubject.create()
 
     private var user = User()
 
@@ -21,7 +21,7 @@ object UserController {
         get() = user.id
 
     //Flow control
-    var userUpdated: PublishSubject<Boolean> = PublishSubject.create()
+    val userUpdated: PublishSubject<Boolean> = PublishSubject.create()
 
     init {
         if (PreferencesController.anonymous) role = Role.ANONYMOUS

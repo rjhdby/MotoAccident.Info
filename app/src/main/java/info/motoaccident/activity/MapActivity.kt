@@ -9,13 +9,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.jakewharton.rxbinding.view.RxView
 import info.motoaccident.MyApplication
 import info.motoaccident.R
-import info.motoaccident.controllers.LocationController
+import info.motoaccident.activity.interfaces.ActivityInterface
 import info.motoaccident.decorators.MapDecorator
 import info.motoaccident.dictionaries.DEVELOPER
 import info.motoaccident.dictionaries.MODERATOR
@@ -25,9 +23,8 @@ import info.motoaccident.utils.bindView
 import info.motoaccident.utils.runActivity
 import rx.Observable
 import rx.Subscription
-import rx.subjects.PublishSubject
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback, ActivityInterface<GoogleMap> {
+class MapActivity : AppCompatActivity(), ActivityInterface<SupportMapFragment> {
     private val createAccidentButton by bindView<ImageButton>(R.id.create_acc)
     private val callButton by bindView<ImageButton>(R.id.call)
     private val toolbar by bindView<Toolbar>(R.id.toolbar)
@@ -36,10 +33,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, ActivityInterface<G
 
     lateinit private var callButtonSubscription: Subscription
     lateinit private var createAccidentButtonSubscription: Subscription
-
-    override val readyForDecorate: PublishSubject<Boolean> = PublishSubject.create()
-
-    private var map: GoogleMap? = null //TODO move to MapDecorator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,8 +46,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, ActivityInterface<G
         super.onResume()
         MyApplication.currentActivity.onNext(this)
         MapDecorator.start(this)
-        if (map == null) mapFragment.getMapAsync(this)
-        else readyForDecorate.onNext(true)
         callButtonSubscription = RxView.clicks(callButton).subscribe { callPressed() }
         createAccidentButtonSubscription = RxView.clicks(callButton).subscribe { createPressed() }
     }
@@ -67,15 +58,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, ActivityInterface<G
         MyApplication.currentActivity.onNext(null)
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-        LocationController.locationEnabled.take(1).subscribe { b -> if (b) map!!.isMyLocationEnabled = true }
-        LocationController.requestPermission(this)
-        readyForDecorate.onNext(true)
-    }
-
-    override fun contentView(): GoogleMap {
-        return map!!
+    override fun contentView(): SupportMapFragment {
+        return mapFragment
     }
 
     override fun getPermittedResources(): Observable<Pair<View, Int>> = Observable.just(
@@ -84,7 +68,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, ActivityInterface<G
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_list -> runActivity(ListActivity::class.java)
+            R.id.action_list     -> runActivity(ListActivity::class.java)
             R.id.action_settings -> runActivity(SettingsActivity::class.java)
         }
         return super.onOptionsItemSelected(item)

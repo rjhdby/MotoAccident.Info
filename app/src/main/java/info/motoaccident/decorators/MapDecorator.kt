@@ -1,50 +1,44 @@
 package info.motoaccident.decorators
 
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import info.motoaccident.R
-import info.motoaccident.activity.ActivityInterface
+import info.motoaccident.activity.interfaces.ActivityInterface
 import info.motoaccident.controllers.ContentController
+import info.motoaccident.controllers.LocationController
+import info.motoaccident.controllers.Orchestrator
+import info.motoaccident.controllers.Orchestrator.Source.*
 import info.motoaccident.controllers.PermissionController
-import info.motoaccident.controllers.PreferencesController
-import info.motoaccident.controllers.UserController
 import info.motoaccident.network.modeles.list.Point
 import info.motoaccident.utils.visible
-import rx.Subscription
+import rx.Observable
 
-object MapDecorator : ViewDecorator<ActivityInterface<GoogleMap>> {
-    lateinit private var target: ActivityInterface<GoogleMap>
-    lateinit private var map: GoogleMap
+object MapDecorator : ViewDecorator<ActivityInterface<SupportMapFragment>>, OnMapReadyCallback {
+    lateinit private var target: ActivityInterface<SupportMapFragment>
+    private var map: GoogleMap? = null
 
-    lateinit private var mapReadySubscription: Subscription
-    lateinit private var contentUpdateSubscription: Subscription
-    lateinit private var preferencesUpdateSubscription: Subscription
-    lateinit private var roleUpdateSubscription: Subscription
+    private var orchestrator = Orchestrator;
 
-    override fun start(target: ActivityInterface<GoogleMap>) {
+    override fun start(target: ActivityInterface<SupportMapFragment>) {
         this.target = target
         updateInterface()
-        mapReadySubscription = target.readyForDecorate.take(1).subscribe { p -> realStart() }
+        if (map == null) target.contentView().getMapAsync(this)
+        else realStart()
     }
 
     private fun realStart() {
         //TODO setup start position
         //TODO subscribe camera change
-        map = target.contentView()
         updateDataSet()
-        contentUpdateSubscription = ContentController.contentUpdated.subscribe { updateDataSet() }
-        preferencesUpdateSubscription = PreferencesController.preferencesUpdated.subscribe { updateDataSet() }
-        roleUpdateSubscription = UserController.userUpdated.subscribe { updateDataSet();updateInterface() }
+        orchestrator.subscribe(arrayOf(ROLE, LOCATION, CONTENT, PREFERENCES), { updateDataSet() })
+        orchestrator.subscribe(ROLE, { updateInterface() })
     }
 
     override fun stop() {
-        if (!mapReadySubscription.isUnsubscribed) mapReadySubscription.unsubscribe()
-        else {
-            contentUpdateSubscription.unsubscribe()
-            preferencesUpdateSubscription.unsubscribe()
-            roleUpdateSubscription.unsubscribe()
-        }
+        orchestrator.unSubscribe()
     }
 
     private fun updateDataSet() {
@@ -52,22 +46,28 @@ object MapDecorator : ViewDecorator<ActivityInterface<GoogleMap>> {
     }
 
     private fun refreshMap(list: List<Point>) {
-        map.clear()
-        for (point in list) {
-            //TODO move to MarkerController
-            val markerOptions = MarkerOptions()
-                    .position(point.location)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.camera_small)) //TODO icons
-                    .anchor(0.5f, 1f)
-                    .alpha(1f)
-                    .title(point.description)
-            map.addMarker(markerOptions)
-        }
-        //TODO implementation
+        map!!.clear()
+        Observable.from(list).subscribe { point -> map!!.addMarker(marker(point)) }
     }
 
     private fun updateInterface() {
         target.getPermittedResources()
                 .subscribe { p -> p.first.visible(PermissionController.check(p.second)) }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        LocationController.locationEnabled.take(1).subscribe { b -> if (b) map!!.isMyLocationEnabled = true }
+        LocationController.requestPermission(target.getContext())
+        realStart()
+    }
+
+    private fun marker(point: Point): MarkerOptions {
+        return MarkerOptions()
+                .position(point.location)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.camera_small)) //TODO icons
+                .anchor(0.5f, 1f)
+                .alpha(1f)
+                .title(point.description)
     }
 }

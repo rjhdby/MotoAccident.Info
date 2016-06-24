@@ -7,10 +7,10 @@ import info.motoaccident.MyApplication
 import rx.subjects.PublishSubject
 
 object PreferencesController {
-    private var preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(MyApplication.context)
+    private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(MyApplication.context)
 
     //Flow control
-    var preferencesUpdated: PublishSubject<Boolean> = PublishSubject.create()
+    val preferencesUpdated: PublishSubject<Boolean> = PublishSubject.create()
 
     //Preferences
     var login: String

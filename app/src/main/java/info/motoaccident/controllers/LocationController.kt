@@ -11,7 +11,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.maps.model.LatLng
 import info.motoaccident.MyApplication
 import info.motoaccident.R
-import info.motoaccident.utils.latLng
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider
 import rx.Observable
 import rx.Subscription
@@ -45,8 +44,8 @@ object LocationController : ActivityCompat.OnRequestPermissionsResultCallback {
                 .setSmallestDisplacement(if (fine) 100f else 2000f)
                 .setInterval(if (fine) 5000 else 600000)
         locationSubscription = locationAdapter.getUpdatedLocation(request)
-                .subscribe { location -> LocationController.locationUpdated.onNext(location.latLng());lastLocation = location.latLng() }
-        Log.d("STATUS LOCATION",fine.toString())
+                .subscribe { location -> LocationController.locationUpdated.onNext(LatLng(location.latitude, location.longitude));lastLocation = LatLng(location.latitude, location.longitude) }
+        Log.d("STATUS LOCATION", fine.toString())
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

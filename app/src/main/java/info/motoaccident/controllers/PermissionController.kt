@@ -1,9 +1,11 @@
 package info.motoaccident.controllers
 
 import info.motoaccident.dictionaries.*
+import rx.subjects.PublishSubject
 
 object PermissionController {
     var localPermissions = 0
+    val permissionsUpdated: PublishSubject<Boolean> = PublishSubject.create()
 
     fun check(permission: Int): Boolean {
         buildLocalPermissions()
@@ -14,9 +16,9 @@ object PermissionController {
         localPermissions = 0;
         when (UserController.role) {
             Role.READ_ONLY, Role.ANONYMOUS, Role.UNAUTHORIZED -> localPermissions = localPermissions or READONLY
-            Role.STANDARD -> localPermissions = localPermissions or STANDARD
-            Role.MODERATOR -> localPermissions = localPermissions or MODERATOR
-            Role.DEVELOPER -> localPermissions = localPermissions or DEVELOPER
+            Role.STANDARD                                     -> localPermissions = localPermissions or STANDARD
+            Role.MODERATOR                                    -> localPermissions = localPermissions or MODERATOR
+            Role.DEVELOPER                                    -> localPermissions = localPermissions or DEVELOPER
         }
         if (phoneEnabled()) localPermissions = localPermissions or PHONE
         if (isLocationEnabled()) localPermissions = localPermissions or LOCATION

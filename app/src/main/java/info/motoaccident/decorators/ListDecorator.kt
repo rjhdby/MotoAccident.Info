@@ -1,34 +1,35 @@
 package info.motoaccident.decorators
 
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.jakewharton.rxbinding.view.RxView
 import info.motoaccident.R
-import info.motoaccident.activity.ActivityInterface
-import info.motoaccident.controllers.*
+import info.motoaccident.activity.DetailsActivity
+import info.motoaccident.activity.interfaces.ActivityInterface
+import info.motoaccident.controllers.ContentController
+import info.motoaccident.controllers.LocationController
+import info.motoaccident.controllers.Orchestrator
+import info.motoaccident.controllers.Orchestrator.Source.*
+import info.motoaccident.controllers.PermissionController
 import info.motoaccident.network.modeles.list.Point
-import info.motoaccident.utils.asAge
-import info.motoaccident.utils.asDistance
-import info.motoaccident.utils.distance
-import info.motoaccident.utils.visible
-import kotlinx.android.synthetic.main.list_view_row.view.*
+import info.motoaccident.utils.*
+import kotlinx.android.synthetic.main.list_row.view.*
 import org.jetbrains.anko.onUiThread
-import rx.Subscription
 
 object ListDecorator : ViewDecorator<ActivityInterface<RecyclerView>> {
     lateinit private var target: ActivityInterface<RecyclerView>
-    lateinit private var contentUpdateSubscription: Subscription
-    lateinit private var preferencesUpdateSubscription: Subscription
-    lateinit private var roleUpdateSubscription: Subscription
-    lateinit private var locationUpdateSubscription: Subscription
+
+    private var orchestrator = Orchestrator;
 
     lateinit private var listView: RecyclerView
 
     override fun start(target: ActivityInterface<RecyclerView>) {
         this.target = target
-        locationUpdateSubscription = LocationController.locationUpdated.subscribe { updateDataSet() }
         //TODO subscribe permission update
         listView = target.contentView()
         target.getContext().onUiThread {
@@ -36,10 +37,9 @@ object ListDecorator : ViewDecorator<ActivityInterface<RecyclerView>> {
         }
         updateInterface()
         updateDataSet()
-        preferencesUpdateSubscription = PreferencesController.preferencesUpdated.subscribe { updateDataSet() }
-        contentUpdateSubscription = ContentController.contentUpdated.subscribe { updateDataSet() }
-        roleUpdateSubscription = UserController.userUpdated.subscribe { updateInterface(); updateDataSet() }
         ContentController.reloadContent()
+        orchestrator.subscribe(arrayOf(ROLE, LOCATION, CONTENT, PREFERENCES), { updateDataSet() })
+        orchestrator.subscribe(ROLE, { updateInterface() })
     }
 
     private fun updateDataSet() = ContentController.observePoints().subscribe { list -> refreshRecyclerView(list) }
@@ -57,19 +57,14 @@ object ListDecorator : ViewDecorator<ActivityInterface<RecyclerView>> {
     }
 
     override fun stop() {
-        contentUpdateSubscription.unsubscribe()
-        preferencesUpdateSubscription.unsubscribe()
-        roleUpdateSubscription.unsubscribe()
-        locationUpdateSubscription.unsubscribe()
+        orchestrator.unSubscribe()
         //TODO unSubscribe permission update
     }
 
     private class RecyclerViewAdapter(var list: List<Point>) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.list_view_row, parent, false)
-            //TODO OnClickListener
-            //TODO list_view_row, resolve 'age' problem
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.list_row, parent, false)
             return ViewHolder(view)
         }
 
@@ -82,13 +77,21 @@ object ListDecorator : ViewDecorator<ActivityInterface<RecyclerView>> {
         private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             fun bind(point: Point) {
                 with(point) {
-                    //TODO type, medicine, owner
+                    itemView.type.text = type.toString()
+                    itemView.damage.text = damage.toString()
                     itemView.address.text = address
                     itemView.owner.text = owner
                     itemView.description.text = description
                     itemView.age.text = time.asAge()
                     itemView.distance.text = location.distance(LocationController.lastLocation).asDistance()
+                    itemView.messages.text = messages.count().toString()
                 }
+                RxView.clicks(itemView).subscribe {
+                    val bundle = Bundle()
+                    bundle.putInt("id", point.id)
+                    (target.getContext() as AppCompatActivity).runActivity(DetailsActivity::class.java, bundle)
+                }
+                //TODO moderator tools on long click
             }
         }
     }

@@ -18,7 +18,7 @@ class Point {
     val lat: Float = 55.752295f
     val lon: Float = 37.622735f
     @SerializedName("t") val type: AccidentType = AccidentType.OTHER
-    val med: AccidentDamage = AccidentDamage.UNKNOWN
+    @SerializedName("med") val damage: AccidentDamage = AccidentDamage.UNKNOWN
     @SerializedName("m") var messages: List<Message> = ArrayList()
     @SerializedName("v") var volunteers: List<Volunteer> = ArrayList()
     @SerializedName("h") var history: List<History> = ArrayList()
@@ -27,10 +27,5 @@ class Point {
         get() = LatLng(lat.toDouble(), lon.toDouble())
         private set
 
-    fun isAccident(): Boolean {
-        when (type) {
-            AccidentType.MOTO_AUTO, AccidentType.MOTO_MAN, AccidentType.MOTO_MOTO, AccidentType.SOLO -> return true
-            else                                                                                     -> return false
-        }
-    }
+    fun isAccident() = type in AccidentType.SOLO..AccidentType.MOTO_MAN
 }

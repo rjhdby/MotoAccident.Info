@@ -13,6 +13,7 @@ import android.widget.ImageButton
 import com.jakewharton.rxbinding.view.RxView
 import info.motoaccident.MyApplication
 import info.motoaccident.R
+import info.motoaccident.activity.interfaces.ActivityInterface
 import info.motoaccident.decorators.ListDecorator
 import info.motoaccident.dictionaries.DEVELOPER
 import info.motoaccident.dictionaries.MODERATOR
@@ -31,8 +32,6 @@ class ListActivity : AppCompatActivity(), ActivityInterface<RecyclerView> {
 
     lateinit private var callButtonSubscription: Subscription
     lateinit private var createAccidentButtonSubscription: Subscription
-
-    override val readyForDecorate: PublishSubject<Boolean> = PublishSubject.create()
 
     override fun getPermittedResources() = Observable.just(
             Pair(createAccidentButton as View, STANDARD or MODERATOR or DEVELOPER),

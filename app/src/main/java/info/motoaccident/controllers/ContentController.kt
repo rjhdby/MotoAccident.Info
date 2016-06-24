@@ -43,8 +43,15 @@ object ContentController {
                 .filter { p -> p.type != AccidentType.STEAL || PreferencesController.steals }
                 .filter { p -> p.location.distance(LocationController.lastLocation) < PreferencesController.showRadius * 1000 }
                 .filter { p -> !p.isAccident() || PreferencesController.accidents }
-                .filter { p -> (p.med != AccidentDamage.HEAVY && p.med != AccidentDamage.LETHAL) || PreferencesController.heavy }
+                .filter { p -> (p.damage != AccidentDamage.HEAVY && p.damage != AccidentDamage.LETHAL) || PreferencesController.heavy }
                 .filter { p -> p.time.asTimeIntervalFromCurrent() / 3600 < PreferencesController.maxAge }
                 .toList()
+    }
+
+    fun getPoint(id: Int): Point {
+        for (point in points) {
+            if (point.id == id) return point
+        }
+        return Point()
     }
 }
