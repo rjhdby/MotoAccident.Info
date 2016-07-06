@@ -42,7 +42,7 @@ class ListActivity : AppCompatActivity(), ActivityInterface<RecyclerView> {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar)
     }
 
     override fun onResume() {

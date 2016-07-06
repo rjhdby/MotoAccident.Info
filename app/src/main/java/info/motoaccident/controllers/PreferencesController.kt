@@ -5,7 +5,7 @@ import android.preference.PreferenceManager
 import com.google.android.gms.maps.model.LatLng
 import info.motoaccident.MyApplication
 import rx.subjects.PublishSubject
-
+//TODO no disturb
 object PreferencesController {
     private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(MyApplication.context)
 
@@ -31,6 +31,10 @@ object PreferencesController {
                 .putFloat("lat", value.latitude.toFloat())
                 .putFloat("lon", value.longitude.toFloat())
                 .apply()
+
+    var noDisturb: Boolean
+        get() = preferences.getBoolean("noDisturb", false)
+        set(value) = preferences.edit().putBoolean("noDisturb", value).apply()
 
     var anonymous: Boolean
         get() = preferences.getBoolean("anonymous", false)

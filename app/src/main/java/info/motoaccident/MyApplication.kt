@@ -7,7 +7,7 @@ import android.support.multidex.MultiDex
 import info.motoaccident.controllers.LocationController
 import rx.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
-
+//TODO on way subscription
 class MyApplication : Application() {
     companion object {
         lateinit var context: Context
@@ -29,7 +29,7 @@ class MyApplication : Application() {
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
+        super.attachBaseContext(base)
+        MultiDex.install(this)
     }
 }

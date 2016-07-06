@@ -1,4 +1,4 @@
-package info.motoaccident.decorators.details
+package info.motoaccident.decorators
 
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -24,7 +24,9 @@ import info.motoaccident.utils.distance
 import kotlinx.android.synthetic.main.message_row.view.*
 import org.jetbrains.anko.enabled
 import org.jetbrains.anko.onUiThread
-
+//TODO create message
+//TODO in place, on way list
+//TODO history
 object DetailsDecorator : ViewDecorator<DetailsActivityInterface> {
     lateinit private var target: DetailsActivityInterface
 

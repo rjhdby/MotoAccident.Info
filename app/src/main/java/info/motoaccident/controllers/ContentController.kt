@@ -1,9 +1,12 @@
 package info.motoaccident.controllers
 
-import info.motoaccident.dictionaries.AccidentDamage
-import info.motoaccident.dictionaries.AccidentStatus
-import info.motoaccident.dictionaries.AccidentType
-import info.motoaccident.dictionaries.Role
+import info.motoaccident.dictionaries.AccidentDamage.HEAVY
+import info.motoaccident.dictionaries.AccidentDamage.LETHAL
+import info.motoaccident.dictionaries.AccidentStatus.ENDED
+import info.motoaccident.dictionaries.AccidentStatus.HIDDEN
+import info.motoaccident.dictionaries.AccidentType.*
+import info.motoaccident.dictionaries.Role.DEVELOPER
+import info.motoaccident.dictionaries.Role.MODERATOR
 import info.motoaccident.network.HttpRequestService
 import info.motoaccident.network.modeles.list.Point
 import info.motoaccident.utils.asTimeIntervalFromCurrent
@@ -36,14 +39,15 @@ object ContentController {
     }
 
     fun observePoints(): Observable<List<Point>> {
-        return Observable.from(points).filter { p -> p.status != AccidentStatus.HIDDEN || (UserController.role == Role.MODERATOR || UserController.role == Role.DEVELOPER) }
-                .filter { p -> p.status != AccidentStatus.ENDED || PreferencesController.ended }
-                .filter { p -> p.type != AccidentType.OTHER || PreferencesController.other }
-                .filter { p -> p.type != AccidentType.BREAK || PreferencesController.breaks }
-                .filter { p -> p.type != AccidentType.STEAL || PreferencesController.steals }
+        return Observable.from(points)
+                .filter { p -> p.status != HIDDEN || (UserController.role == MODERATOR || UserController.role == DEVELOPER) }
+                .filter { p -> p.status != ENDED || PreferencesController.ended }
+                .filter { p -> p.type != OTHER || PreferencesController.other }
+                .filter { p -> p.type != BREAK || PreferencesController.breaks }
+                .filter { p -> p.type != STEAL || PreferencesController.steals }
                 .filter { p -> p.location.distance(LocationController.lastLocation) < PreferencesController.showRadius * 1000 }
                 .filter { p -> !p.isAccident() || PreferencesController.accidents }
-                .filter { p -> (p.damage != AccidentDamage.HEAVY && p.damage != AccidentDamage.LETHAL) || PreferencesController.heavy }
+                .filter { p -> (p.damage != HEAVY && p.damage != LETHAL) || PreferencesController.heavy }
                 .filter { p -> p.time.asTimeIntervalFromCurrent() / 3600 < PreferencesController.maxAge }
                 .toList()
     }

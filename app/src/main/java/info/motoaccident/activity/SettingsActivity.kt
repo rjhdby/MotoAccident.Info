@@ -18,6 +18,24 @@ import info.motoaccident.MyApplication
 import info.motoaccident.R
 import info.motoaccident.utils.bindView
 
+//TODO general
+//App version
+//Login name/role
+//Sign in/sign out
+//No disturb
+
+//TODO list
+//radius
+//types
+//damage
+//age
+
+//TODO notifications
+//radius
+//types
+//damage
+//sound/vibration
+
 /**
  * A [PreferenceActivity] that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,
@@ -31,9 +49,10 @@ import info.motoaccident.utils.bindView
  */
 class SettingsActivity : AppCompatPreferenceActivity() {
     private val toolbar by bindView<Toolbar>(R.id.toolbar)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setupActionBar()
+//        setupActionBar()
     }
 
     override fun onResume() {
@@ -50,7 +69,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
      * Set up the [android.app.ActionBar], if the API is available.
      */
     private fun setupActionBar() {
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar)
     }
 
     /**
@@ -116,7 +135,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     class NotificationPreferenceFragment : PreferenceFragment() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            addPreferencesFromResource(R.xml.pref_notification)
+            addPreferencesFromResource(R.xml.pref_list)
             setHasOptionsMenu(true)
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
@@ -144,7 +163,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     class DataSyncPreferenceFragment : PreferenceFragment() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            addPreferencesFromResource(R.xml.pref_data_sync)
+            addPreferencesFromResource(R.xml.pref_notifications)
             setHasOptionsMenu(true)
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences

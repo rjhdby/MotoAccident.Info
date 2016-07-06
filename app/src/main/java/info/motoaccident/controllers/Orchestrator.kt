@@ -18,17 +18,16 @@ object Orchestrator {
     }
 
     fun subscribe(source: Source, target: (item: Any) -> Unit) {
+        val observable = when (source) {
+            LOCATION     -> LocationController.locationUpdated
+            ROLE         -> UserController.userUpdated
+            PREFERENCES  -> PreferencesController.preferencesUpdated
+            PERMISSIONS  -> PermissionController.permissionsUpdated
+            CONTENT      -> ContentController.contentUpdated
+            NOTIFICATION -> NotificationController.notificationReceived
+        }
 
-        subscribers.add(Pair(source,
-                             when (source) {
-                                 LOCATION     -> LocationController.locationUpdated.subscribe({ l -> target(l) })
-                                 ROLE         -> UserController.userUpdated.subscribe({ l -> target(l) })
-                                 PREFERENCES  -> PreferencesController.preferencesUpdated.subscribe({ l -> target(l) })
-                                 PERMISSIONS  -> PermissionController.permissionsUpdated.subscribe({ l -> target(l) })
-                                 CONTENT      -> ContentController.contentUpdated.subscribe({ l -> target(l) })
-                                 NOTIFICATION -> NotificationController.notificationReceived.subscribe({ l -> target(l) })
-                             }
-                            ))
+        subscribers.add(Pair(source, observable.subscribe({ l -> target(l!!) })))
     }
 
     fun subscribe(sources: Array<Source>, target: (item: Any) -> Unit) {

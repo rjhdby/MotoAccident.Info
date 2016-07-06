@@ -13,7 +13,7 @@ import android.widget.TextView
 import info.motoaccident.MyApplication
 import info.motoaccident.R
 import info.motoaccident.activity.interfaces.DetailsActivityInterface
-import info.motoaccident.decorators.details.DetailsDecorator
+import info.motoaccident.decorators.DetailsDecorator
 import info.motoaccident.utils.bindView
 
 class DetailsActivity : AppCompatActivity(), DetailsActivityInterface {

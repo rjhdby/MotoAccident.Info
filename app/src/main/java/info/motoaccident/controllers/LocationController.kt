@@ -15,7 +15,7 @@ import pl.charmas.android.reactivelocation.ReactiveLocationProvider
 import rx.Observable
 import rx.Subscription
 import rx.subjects.PublishSubject
-
+//TODO on way
 object LocationController : ActivityCompat.OnRequestPermissionsResultCallback {
     val locationUpdated: PublishSubject<LatLng> = PublishSubject.create()
     val locationEnabled: PublishSubject<Boolean> = PublishSubject.create()
@@ -63,7 +63,7 @@ object LocationController : ActivityCompat.OnRequestPermissionsResultCallback {
             if (ActivityCompat.shouldShowRequestPermissionRationale(context as Activity, Manifest.permission.READ_CONTACTS)) {
                 Snackbar.make(context.findViewById(R.id.coordinatorLayout), "В случае запрета определения местоположения будет установлено местоположение по умолчанию - центр г.Москва. В этом случае не забудьте поправить настройки радиуса оповещения.", Snackbar.LENGTH_LONG)
                         .setAction("ОК", { v -> ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), 1) })
-                        .show();
+                        .show()
             } else {
                 ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.ACCESS_FINE_LOCATION), 1)
             }
