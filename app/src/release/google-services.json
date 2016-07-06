@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "859507240982",
+    "project_id": "moto-accidents-info"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859507240982:android:11d6edff773b52b7",
+        "android_client_info": {
+          "package_name": "info.motoaccident"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWTh9AI9TSfHaV_PIu75bo-sxwz77g_Sc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
